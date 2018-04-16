@@ -32,11 +32,11 @@ class StreamListener(tweepy.StreamListener):
         try:
             text, time = tweet.split('&gt;') 
             if 'min' in time and 'h' in time:
-                time = time.replace('h', '*60*').replace('min', '*60')
+                time = time.replace('h', '*3600*').replace('min', '*60')
             elif 'd' in time:
                 time = time.replace('d', '*86400')
             else:
-                time = time.replace('h', '*60').replace('min', '*60')
+                time = time.replace('h', '*3600').replace('min', '*60')
             time = time.split('*')
             time = list(map(int, time))
             timeSec = 1
