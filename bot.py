@@ -22,6 +22,9 @@ def scheduleTweet(time, text, id, account):
 
 class StreamListener(tweepy.StreamListener):
     def on_status(self, status):
+        if status.retweeted or 'RT @' in status.text:
+            return None
+
         tweet = status.text
         account = status.user.screen_name
         tweetId = status.id
