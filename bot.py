@@ -1,19 +1,48 @@
 from credentials import *
 from time import sleep
 from threading import Timer
+import json
 import tweepy
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 tag = '#remindme'
+file_name = 'tweets.txt'
+
+tweets = json.load(file_name)
+
+for tweet in tweets:
+    t = tweet['actualTime'] + tweet['time']
+    actualT = time.time()
+    if (t > actualT) or ((t-actualT) < 1800):
+        new_time = t - actualT
+        tw = Timer(new_time, remember,
+                args = [
+                    tweet['text'],
+                    tweet['id'],
+                    tweet['account']
+                ]
+            )
+        tw.start()
 
 def remember(text, tweetId, user):
     tweet = f'@{user} {text}'
     api.update_status(status=tweet, in_reply_to_status=tweetId)
 
+def scheduleTweet(actualTime, time, text, id, account):
+    f = open(file_name, 'a')
+    tweetJson = {
+            'actualTime': actualTime,
+            'time': time,
+            'text': text,
+            'account': account,
+            'id': id
+    }
+    tweets.append(tweetJson)
+    json.dump(tweets, f)
+    f.close()
 
-def scheduleTweet(time, text, id, account):
     t = Timer(time, remember, 
             args=[text, id, account]
         )
@@ -46,8 +75,9 @@ class StreamListener(tweepy.StreamListener):
             return None
 
         text = text.replace(tag, '')
+        actualTime = time.time()
     
-        scheduleTweet(timeSec, text, tweetId, account)
+        scheduleTweet(actualTime, timeSec, text, tweetId, account)
 
 
 myStream = StreamListener()
