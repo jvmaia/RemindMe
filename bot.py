@@ -1,5 +1,6 @@
 from credentials import *
 from time import sleep
+import time as Time
 from threading import Timer
 import json
 import tweepy
@@ -8,9 +9,10 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 tag = '#remindme'
-file_name = 'tweets.txt'
+file_name = 'tweets.json'
 
-tweets = json.load(file_name)
+fn = open(file_name)
+tweets = json.load(fn)
 
 for tweet in tweets:
     t = tweet['actualTime'] + tweet['time']
@@ -75,7 +77,7 @@ class StreamListener(tweepy.StreamListener):
             return None
 
         text = text.replace(tag, '')
-        actualTime = time.time()
+        actualTime = Time.time()
     
         scheduleTweet(actualTime, timeSec, text, tweetId, account)
 
