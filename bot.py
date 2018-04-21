@@ -81,6 +81,9 @@ class StreamListener(tweepy.StreamListener):
     
         scheduleTweet(actualTime, timeSec, text, tweetId, account)
 
+        confirmed_text = f'@{account} reminder confirmed'
+        api.update_status(status=confirmed_text, in_reply_to_status=tweetId)
+
 
 myStream = StreamListener()
 stream = tweepy.Stream(auth=api.auth, listener=myStream)
