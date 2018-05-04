@@ -11,12 +11,19 @@ api = tweepy.API(auth)
 tag = '#remindme'
 file_name = 'tweets.json'
 
+def remember(text, tweetId, user):
+    tweet = f'@{user} {text}'
+    try:
+        api.update_status(status=tweet, in_reply_to_status=tweetId)
+    except:
+        return None
+
 fn = open(file_name)
 tweets = json.load(fn)
 
 for tweet in tweets:
     t = tweet['actualTime'] + tweet['time']
-    actualT = time.time()
+    actualT = Time.time()
     if (t > actualT) or ((t-actualT) < 1800):
         new_time = t - actualT
         tw = Timer(new_time, remember,
@@ -28,12 +35,8 @@ for tweet in tweets:
             )
         tw.start()
 
-def remember(text, tweetId, user):
-    tweet = f'@{user} {text}'
-    api.update_status(status=tweet, in_reply_to_status=tweetId)
-
 def scheduleTweet(actualTime, time, text, id, account):
-    f = open(file_name, 'a')
+    f = open(file_name, 'w')
     tweetJson = {
             'actualTime': actualTime,
             'time': time,
@@ -82,7 +85,14 @@ class StreamListener(tweepy.StreamListener):
         scheduleTweet(actualTime, timeSec, text, tweetId, account)
 
         confirmed_text = f'@{account} reminder confirmed'
-        api.update_status(status=confirmed_text, in_reply_to_status=tweetId)
+        c = 0
+        while True:
+            try:
+                api.update_status(status=confirmed_text, in_reply_to_status=tweetId)
+                break
+            except:
+                confirmed_text = f'@{account} reminder number {c} confirmed'
+                c+=1
 
 
 myStream = StreamListener()
