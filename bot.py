@@ -24,7 +24,7 @@ tweets = json.load(fn)
 for tweet in tweets:
     t = tweet['actualTime'] + tweet['time']
     actualT = Time.time()
-    if (t > actualT) or ((t-actualT) < 1800):
+    if t > actualT:
         new_time = t - actualT
         tw = Timer(new_time, remember,
                 args = [
